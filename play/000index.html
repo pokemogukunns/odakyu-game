@@ -69,6 +69,7 @@
     const MAX_SCORE = 10000;
     const SPECIAL_SCORE = 500; // 17番目に多いスコア
     const SCORE_INCREMENT = 0.1; // スコアの増加率
+    const DROP_ZONE_Y = canvas ? canvas.height / 4 : 0; // 落とせる部分のY座標
 
     // ボールのサイズに応じた画像のインデックス
     const evolveImages = [
@@ -223,7 +224,7 @@
 
     function drawDropZone() {
       ctx.fillStyle = 'rgba(200, 200, 200, 0.5)'; // 薄い灰色
-      ctx.fillRect(0, canvas.height / 3, canvas.width * 0.8, canvas.height * 2 / 3); // 落とせる部分を描画
+      ctx.fillRect(0, canvas.height / 4, canvas.width * 0.8, canvas.height * 3 / 4); // 落とせる部分を描画
     }
 
     function triggerGameOver() {
@@ -270,7 +271,7 @@
         this.x += this.vx;
         this.y += this.vy;
 
-        if (this.y > canvas.height / 3) {
+        if (this.y < canvas.height / 4) { // 画面の上から4分の1の位置
           triggerGameOver();
         }
       }
@@ -285,7 +286,7 @@
     canvas.addEventListener('click', (event) => {
       if (gameOver) return;
       let x = event.clientX - canvas.offsetLeft;
-      let y = canvas.height / 3; // 落とす y 座標は画面の上から 3 分の 1
+      let y = canvas.height / 4; // 落とす y 座標は画面の上から4分の1
       balls.push(new Ball(x, y, Math.floor(Math.random() * 5))); // 画像のインデックスは IMG_0027_0915094511 から IMG_0031_0915094617 まで
     });
   </script>
