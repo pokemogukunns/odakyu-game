@@ -69,35 +69,37 @@
     const MAX_SCORE = 10000;
     const SPECIAL_SCORE = 500; // 17番目に多いスコア
     const SCORE_INCREMENT = 0.1; // スコアの増加率
-    const BASE_RADIUS = 15; // 基本のボールの半径
 
+    // ボールのサイズに応じた画像のインデックス
     const evolveImages = [
-      'IMG_0027_0915094511.png',
-      'IMG_0028_0915094532.png',
-      'IMG_0029_0915094551.png',
-      'IMG_0030_0915094604.png',
-      'IMG_0031_0915094617.png',
-      'IMG_0032_0915094632.png',
-      'IMG_0033_0915094656.png',
-      'IMG_0034_0915094710.png',
-      'IMG_0035_0915094729.png',
-      'IMG_0036_0915094747.png',
-      'IMG_0037_0915094758.png',
-      'IMG_0038_0915094812.png',
-      'IMG_0039_0915094826.png',
-      'IMG_0040_0915094851.png',
-      'IMG_0051_0915095150.png',
-      'IMG_0041_0915094910.png',
-      'IMG_0042_0915094930.png',
-      'IMG_0043_0915094945.png',
-      'IMG_0044_0915094957.png',
-      'IMG_0045_0915095011.png',
-      'IMG_0046_0915095024.png',
-      'IMG_0047_0915095034.png',
-      'IMG_0048_0915095053.png',
-      'IMG_0049_0915095117.png',
-      'IMG_0050_0915095137.png'
+      'IMG_0027_0915094511.png', // 100%
+      'IMG_0028_0915094532.png', // 110%
+      'IMG_0029_0915094551.png', // 120%
+      'IMG_0030_0915094604.png', // 130%
+      'IMG_0031_0915094617.png', // 140%
+      'IMG_0032_0915094632.png', // 150%
+      'IMG_0033_0915094656.png', // 160%
+      'IMG_0034_0915094710.png', // 170%
+      'IMG_0035_0915094729.png', // 180%
+      'IMG_0036_0915094747.png', // 190%
+      'IMG_0037_0915094758.png', // 200%
+      'IMG_0038_0915094812.png', // 210%
+      'IMG_0039_0915094826.png', // 220%
+      'IMG_0040_0915094851.png', // 230%
+      'IMG_0051_0915095150.png', // 240%
+      'IMG_0041_0915094910.png', // 250%
+      'IMG_0042_0915094930.png', // 260%
+      'IMG_0043_0915094945.png', // 270%
+      'IMG_0044_0915094957.png', // 280%
+      'IMG_0045_0915095011.png', // 290%
+      'IMG_0046_0915095024.png', // 300%
+      'IMG_0047_0915095034.png', // 310%
+      'IMG_0048_0915095053.png', // 320%
+      'IMG_0049_0915095117.png', // 330%
+      'IMG_0050_0915095137.png'  // 340%
     ];
+
+    const BASE_RADIUS = 15; // 基本のボールの半径（IMG_0027_0915094511のサイズ）
 
     window.onload = () => {
       canvas = document.getElementById('gameCanvas');
@@ -118,7 +120,7 @@
       for (let i = 0; i < 10; i++) {
         let x = Math.random() * (canvas.width - BASE_RADIUS * 2) + BASE_RADIUS;
         let y = Math.random() * (canvas.height / 3 - BASE_RADIUS * 2) + BASE_RADIUS;
-        let imageIndex = Math.floor(Math.random() * (evolveImages.length - 6)); // IMG_0027_0915094511 から IMG_0031_0915094617までのインデックス
+        let imageIndex = Math.floor(Math.random() * 6); // IMG_0027_0915094511 から IMG_0032_0915094632までのインデックス
         balls.push(new Ball(x, y, imageIndex));
       }
     }
@@ -202,11 +204,11 @@
     function evolveBall(ball1, ball2) {
       if (ball1.evolutionIndex < evolveImages.length - 1) {
         ball1.evolutionIndex++;
-        ball1.radius *= 1.1; // ボールのサイズを10%増加
+        ball1.radius = BASE_RADIUS * (1 + (ball1.evolutionIndex + 6) * 0.1); // 画像に応じたサイズに設定
       }
       if (ball2.evolutionIndex < evolveImages.length - 1) {
         ball2.evolutionIndex++;
-        ball2.radius *= 1.1; // ボールのサイズを10%増加
+        ball2.radius = BASE_RADIUS * (1 + (ball2.evolutionIndex + 6) * 0.1); // 画像に応じたサイズに設定
       }
     }
 
@@ -249,7 +251,7 @@
       constructor(x, y, imageIndex) {
         this.x = x;
         this.y = y;
-        this.radius = BASE_RADIUS;
+        this.radius = BASE_RADIUS; // 基本のボールの半径
         this.imageIndex = imageIndex;
         this.evolutionIndex = imageIndex;
         this.vx = (Math.random() - 0.5) * 2;
@@ -286,7 +288,7 @@
       if (gameOver) return;
       let x = event.clientX - canvas.offsetLeft;
       let y = canvas.height / 3; // 落とす y 座標は画面の上から 3 分の 1
-      balls.push(new Ball(x, y, Math.floor(Math.random() * (evolveImages.length - 6)))); // 画像のインデックスは IMG_0027_0915094511 から IMG_0031_0915094617 まで
+      balls.push(new Ball(x, y, Math.floor(Math.random() * 5))); // 画像のインデックスは IMG_0027_0915094511 から IMG_0031_0915094617 まで
     });
   </script>
 </body>
