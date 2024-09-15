@@ -23,20 +23,20 @@
       const SPECIAL_SCORE = 500; // 17番目に多いスコア
       const SCORE_INCREMENT = 0.10; // スコアの増加率
       const BALL_SIZE = 10; // さくらんぼの50%サイズ（例：10pxでスタート）
-      const EVOLVED_IMAGE_INDEX = 10; // IMG_0036_0915094747 のインデックス
+      const EVOLVED_IMAGE_INDEX = 9; // IMG_0036_0915094747 のインデックス
 
       function preload() {
         // 進化の順に画像を読み込む
         let imagePaths = [
-          'IMG_0027_0915094511.jpg', 'IMG_0028_0915094532.jpg', 'IMG_0029_0915094551.jpg',
-          'IMG_0030_0915094604.jpg', 'IMG_0031_0915094617.jpg', 'IMG_0032_0915094632.jpg',
-          'IMG_0033_0915094656.jpg', 'IMG_0034_0915094710.jpg', 'IMG_0035_0915094729.jpg',
-          'IMG_0036_0915094747.jpg', 'IMG_0037_0915094758.jpg', 'IMG_0038_0915094812.jpg',
-          'IMG_0039_0915094826.jpg', 'IMG_0040_0915094851.jpg', 'IMG_0051_0915095150.jpg',
-          'IMG_0041_0915094910.jpg', 'IMG_0042_0915094930.jpg', 'IMG_0043_0915094945.jpg',
-          'IMG_0044_0915094957.jpg', 'IMG_0045_0915095011.jpg', 'IMG_0046_0915095024.jpg',
-          'IMG_0047_0915095034.jpg', 'IMG_0048_0915095053.jpg', 'IMG_0049_0915095117.jpg',
-          'IMG_0050_0915095137.jpg'
+          'IMG_0027_0915094511.png', 'IMG_0028_0915094532.png', 'IMG_0029_0915094551.png',
+          'IMG_0030_0915094604.png', 'IMG_0031_0915094617.png', 'IMG_0032_0915094632.png',
+          'IMG_0033_0915094656.png', 'IMG_0034_0915094710.png', 'IMG_0035_0915094729.png',
+          'IMG_0036_0915094747.png', 'IMG_0037_0915094758.png', 'IMG_0038_0915094812.png',
+          'IMG_0039_0915094826.png', 'IMG_0040_0915094851.png', 'IMG_0051_0915095150.png',
+          'IMG_0041_0915094910.png', 'IMG_0042_0915094930.png', 'IMG_0043_0915094945.png',
+          'IMG_0044_0915094957.png', 'IMG_0045_0915095011.png', 'IMG_0046_0915095024.png',
+          'IMG_0047_0915095034.png', 'IMG_0048_0915095053.png', 'IMG_0049_0915095117.png',
+          'IMG_0050_0915095137.png'
         ];
 
         for (let path of imagePaths) {
@@ -167,8 +167,9 @@
             increaseScore(SPECIAL_SCORE); // 17番目に多いスコアを加算
             ball1.evolutionIndex = EVOLVED_IMAGE_INDEX; // IMG_0036_0915094747 へ進化
             ball2.evolutionIndex = EVOLVED_IMAGE_INDEX; // IMG_0036_0915094747 へ進化
+            // 進化後の画像を描画する
+            removeBalls(ball1, ball2); // 元の画像を消去
           }
-          removeBalls(ball1, ball2); // 画像を消去
         }
       }
 
