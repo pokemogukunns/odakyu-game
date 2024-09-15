@@ -28,6 +28,12 @@
       border: none;
       cursor: pointer;
     }
+    #score {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+    }
   </style>
 </head>
 <body>
@@ -35,6 +41,7 @@
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverMessage">Game Over</div>
     <button id="expandButton">Expand Canvas</button>
+    <div id="score">Score: 0</div>
   </div>
 
   <script>
@@ -48,7 +55,7 @@
     const MAX_SCORE = 10000;
     const SPECIAL_SCORE = 500; // 17番目に多いスコア
     const SCORE_INCREMENT = 0.1; // スコアの増加率
-    const BALL_RADIUS = 15; // ボールの半径
+    const BASE_RADIUS = 15; // 基本のボールの半径
 
     const evolveImages = [
       'IMG_0027_0915094511.png',
@@ -81,10 +88,10 @@
     window.onload = () => {
       canvas = document.getElementById('gameCanvas');
       ctx = canvas.getContext('2d');
-      resizeCanvas(windowWidth * 0.8, windowHeight * 0.8);
+      resizeCanvas(window.innerWidth * 0.8, window.innerHeight * 0.8);
 
       document.getElementById('expandButton').addEventListener('click', () => {
-        resizeCanvas(windowWidth * 0.8, windowHeight * 0.8);
+        resizeCanvas(window.innerWidth * 0.8, window.innerHeight * 0.8);
       });
 
       setup();
@@ -92,14 +99,15 @@
     };
 
     function setup() {
-      // ここでボールを初期化する処理を追加する
+      // ボールの初期化処理を追加する
+      // 例: balls.push(new Ball(x, y, initialImageIndex));
     }
 
     function gameLoop() {
       if (gameOver) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       for (let ball of balls) {
         ball.update();
         ball.display();
@@ -117,10 +125,9 @@
         let dx = otherBall.x - currentBall.x;
         let dy = otherBall.y - currentBall.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
-        let minDistance = currentBall.diameter / 2 + otherBall.diameter / 2;
+        let minDistance = (currentBall.radius + otherBall.radius);
 
         if (distance < minDistance) {
-          // 短距離
           let angle = Math.atan2(dy, dx);
           let overlap = minDistance - distance;
           let pushX = overlap * Math.cos(angle) / 2;
@@ -137,11 +144,11 @@
     }
 
     function updateScore() {
-      document.getElementById('score').textContent = score;
+      document.getElementById('score').textContent = `Score: ${score}`;
     }
 
     function handleCollision(ball1, ball2) {
-      // IMG_0040_0915094851 と IMG_0051_0915095150 の組み合わせ
+      // 特別なスコアを加算する条件
       if (
         (ball1.evolutionIndex === evolveImages.length - 9 && ball2.evolutionIndex === evolveImages.length - 10) ||
         (ball1.evolutionIndex === evolveImages.length - 10 && ball2.evolutionIndex === evolveImages.length - 9)
@@ -150,7 +157,7 @@
         removeBalls(ball1, ball2); // 進化後の画像を消去
       }
 
-      // IMG_0034_0915094710 と IMG_0035_0915094729 の組み合わせ
+      // 17番目に多いスコアを加算する条件
       if (
         (ball1.evolutionIndex === evolveImages.length - 17 && ball2.evolutionIndex === evolveImages.length - 16) ||
         (ball1.evolutionIndex === evolveImages.length - 16 && ball2.evolutionIndex === evolveImages.length - 17)
@@ -174,9 +181,11 @@
     function evolveBall(ball1, ball2) {
       if (ball1.evolutionIndex < evolveImages.length - 1) {
         ball1.evolutionIndex++;
+        ball1.radius *= 1.1; // ボールのサイズを10%増加
       }
       if (ball2.evolutionIndex < evolveImages.length - 1) {
         ball2.evolutionIndex++;
+        ball2.radius *= 1.1; // ボールのサイズを10%増加
       }
     }
 
@@ -186,7 +195,7 @@
 
     function increaseScore(amount = 10) {
       score += amount;
-      document.getElementById('score').textContent = score;
+      updateScore();
     }
 
     function triggerGameOver() {
