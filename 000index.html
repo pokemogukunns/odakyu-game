@@ -87,16 +87,16 @@
       'IMG_0039_0915094826.png', // 220%
       'IMG_0040_0915094851.png', // 230%
       'IMG_0051_0915095150.png', // 240%
-      'IMG_0041_0915094910.png', // 250%
-      'IMG_0042_0915094930.png', // 260%
-      'IMG_0043_0915094945.png', // 270%
-      'IMG_0044_0915094957.png', // 280%
-      'IMG_0045_0915095011.png', // 290%
-      'IMG_0046_0915095024.png', // 300%
-      'IMG_0047_0915095034.png', // 310%
-      'IMG_0048_0915095053.png', // 320%
-      'IMG_0049_0915095117.png', // 330%
-      'IMG_0050_0915095137.png'  // 340%
+      'IMG_0041_0915094910.png',
+      'IMG_0042_0915094930.png',
+      'IMG_0043_0915094945.png',
+      'IMG_0044_0915094957.png',
+      'IMG_0045_0915095011.png',
+      'IMG_0046_0915095024.png',
+      'IMG_0047_0915095034.png',
+      'IMG_0048_0915095053.png',
+      'IMG_0049_0915095117.png',
+      'IMG_0050_0915095137.png'
     ];
 
     const BASE_RADIUS = 15; // 基本のボールの半径（IMG_0027_0915094511のサイズ）
@@ -120,7 +120,7 @@
       for (let i = 0; i < 10; i++) {
         let x = Math.random() * (canvas.width - BASE_RADIUS * 2) + BASE_RADIUS;
         let y = Math.random() * (canvas.height / 3 - BASE_RADIUS * 2) + BASE_RADIUS;
-        let imageIndex = Math.floor(Math.random() * 6); // IMG_0027_0915094511 から IMG_0032_0915094632までのインデックス
+        let imageIndex = Math.floor(Math.random() * 5); // IMG_0027_0915094511 から IMG_0031_0915094617までのインデックス
         balls.push(new Ball(x, y, imageIndex));
       }
     }
@@ -194,10 +194,8 @@
       // 進化処理
       if (ball1.evolutionIndex === ball2.evolutionIndex) {
         evolveBall(ball1, ball2);
-        increaseScore(10 + score * SCORE_INCREMENT); // スコアが段々増える
-        if (ball1.evolutionIndex === evolveImages.length - 1) {
-          removeBalls(ball1, ball2); // 進化後の画像を消去
-        }
+        increaseScore(10 + score * SCORE_INCREMENT); // スコア増加
+        removeBalls(ball1, ball2); // 進化後の画像を消去
       }
     }
 
