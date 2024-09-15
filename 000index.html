@@ -34,6 +34,19 @@
       left: 10px;
       font-size: 20px;
     }
+    #loadingMessage {
+      display: block;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: black;
+      background: white;
+      padding: 20px;
+      border: 2px solid black;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -42,6 +55,7 @@
     <div id="gameOverMessage">Game Over</div>
     <button id="expandButton">Expand Canvas</button>
     <div id="score">Score: 0</div>
+    <div id="loadingMessage">読み込み中…</div> <!-- 読み込み中のメッセージ -->
   </div>
 
   <script>
@@ -90,12 +104,12 @@
       ctx = canvas.getContext('2d');
       resizeCanvas(window.innerWidth * 0.8, window.innerHeight * 0.8);
 
-      document.getElementById('expandButton').addEventListener('click', () => {
-        resizeCanvas(window.innerWidth * 0.8, window.innerHeight * 0.8);
-      });
-
-      setup();
-      requestAnimationFrame(gameLoop);
+      // 初期化処理が完了したら読み込み中のメッセージを非表示にする
+      setTimeout(() => {
+        document.getElementById('loadingMessage').style.display = 'none';
+        setup();
+        requestAnimationFrame(gameLoop);
+      }, 1000); // 1秒後にゲームを開始する例
     };
 
     function setup() {
@@ -207,6 +221,9 @@
       canvas.width = width;
       canvas.height = height;
     }
+   function windowResized() {
+  resizeCanvas(windowWidth * 0.8, windowHeight * 0.8); // キャンバスサイズを80%に設定
+}
   </script>
 </body>
 </html>
