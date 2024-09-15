@@ -4,21 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>鉄球進化シミュレーション</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #game-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f0f0f0;
+      }
+      canvas {
+        border: 1px solid #000;
+      }
+      #controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      }
+      #score-container {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      }
+      #gameOverMessage {
+        display: none;
+        color: red;
+        font-size: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   </head>
   <body>
-    <h1>鉄球進化シミュレーション</h1>
-    <label for="gravityInput">重力の強さを入力 (例: 0.1〜1.0): </label>
-    <input type="number" id="gravityInput" value="0.5" step="0.1" />
-    <button id="applyGravity">重力を適用</button>
-    <p>スコア: <span id="score">0</span></p>
-    <p id="gameOverMessage" style="display: none; color: red; font-size: 20px;">ゲームオーバー！</p>
+    <div id="game-container">
+      <div id="controls">
+        <label for="gravityInput">重力の強さを入力 (例: 0.1〜1.0): </label>
+        <input type="number" id="gravityInput" value="0.5" step="0.1" />
+        <button id="applyGravity">重力を適用</button>
+        <button id="expandButton">拡大</button>
+      </div>
+      <div id="score-container">
+        スコア: <span id="score">0</span>
+      </div>
+      <p id="gameOverMessage">ゲームオーバー！</p>
+    </div>
     <script>
       let balls = [];
       let gravity = 0.5;
       let evolveImages = [];
       let score = 0;
       let gameOver = false;
+      let canvas;
       const MAX_SCORE = 10000; // 特別な最大スコア
       const SPECIAL_SCORE = 500; // 17番目に多いスコア
       const SCORE_INCREMENT = 0.10; // スコアの増加率
@@ -45,16 +101,22 @@
       }
 
       function setup() {
-        createCanvas(400, 400);
+        canvas = createCanvas(windowWidth, windowHeight);
+        canvas.parent('game-container'); // canvas を指定の div に追加
 
         document.getElementById('applyGravity').addEventListener('click', function () {
           gravity = parseFloat(document.getElementById('gravityInput').value);
         });
 
+        document.getElementById('expandButton').addEventListener('click', function () {
+          resizeCanvas(windowWidth, windowHeight);
+          redraw(); // 再描画
+        });
+
         // マウスクリックで鉄球（画像）を生成
-        canvas.addEventListener('click', function () {
+        canvas.elt.addEventListener('click', function (event) {
           if (!gameOver) {
-            let mouseXPosition = mouseX;
+            let mouseXPosition = event.clientX - canvas.elt.offsetLeft;
             let yPosition = height / 3; // y座標は画面の上から3分の1に固定
             let randomIndex = Math.floor(Math.random() * 5); // 画像は 0〜4 インデックス
             balls.push(new IronBall(mouseXPosition, yPosition, randomIndex));
@@ -137,39 +199,40 @@
       }
 
       function handleCollision(ball1, ball2) {
-        // プレイヤーが落とせる画像の範囲
+        // プレイヤーが落とせる画像は IMG_0027_0915094511 から IMG_0031_0915094617 まで
         if (
           (ball1.evolutionIndex >= 0 && ball1.evolutionIndex <= 4) &&
           (ball2.evolutionIndex >= 0 && ball2.evolutionIndex <= 4)
         ) {
-          // 同じ画像同士のスコアを10%増加させる
+          // 進化処理とスコア処理
           if (ball1.evolutionIndex === ball2.evolutionIndex) {
-            let increment = Math.floor(score * SCORE_INCREMENT);
-            increaseScore(increment); // 10% 増加
-            evolveBall(ball1, ball2); // 進化する処理
+            evolveBall(ball1, ball2);
+            increaseScore(10 + score * SCORE_INCREMENT); // スコアが段々増える
+            if (ball1.evolutionIndex === EVOLVED_IMAGE_INDEX) {
+              removeBalls(ball1, ball2); // 進化した後は元の画像を消去
+            }
           }
-          // IMG_0040_0915094851 と IMG_0051_0915095150 の組み合わせで特別な最大スコア
-          else if (
-            (ball1.evolutionIndex === evolveImages.length - 11 && ball2.evolutionIndex === evolveImages.length - 11) || // IMG_0040_0915094851 同士
-            (ball1.evolutionIndex === evolveImages.length - 1 && ball2.evolutionIndex === evolveImages.length - 1) || // IMG_0051_0915095150 同士
-            (ball1.evolutionIndex === evolveImages.length - 11 && ball2.evolutionIndex === evolveImages.length - 1) || // IMG_0040_0915094851 と IMG_0051_0915095150
-            (ball1.evolutionIndex === evolveImages.length - 1 && ball2.evolutionIndex === evolveImages.length - 11)
-          ) {
-            increaseScore(MAX_SCORE); // 特別な最大スコアを加算
-            removeBalls(ball1, ball2); // 画像を消去
-          }
-          // IMG_0034_0915094710 同士、または IMG_0034_0915094710 と IMG_0035_0915094729 の組み合わせ
-          else if (
-            (ball1.evolutionIndex === evolveImages.length - 17 && ball2.evolutionIndex === evolveImages.length - 17) || // IMG_0034_0915094710 同士
-            (ball1.evolutionIndex === evolveImages.length - 17 && ball2.evolutionIndex === evolveImages.length - 16) || // IMG_0034_0915094710 と IMG_0035_0915094729
-            (ball1.evolutionIndex === evolveImages.length - 16 && ball2.evolutionIndex === evolveImages.length - 16) // IMG_0035_0915094729 同士
-          ) {
-            increaseScore(SPECIAL_SCORE); // 17番目に多いスコアを加算
-            ball1.evolutionIndex = EVOLVED_IMAGE_INDEX; // IMG_0036_0915094747 へ進化
-            ball2.evolutionIndex = EVOLVED_IMAGE_INDEX; // IMG_0036_0915094747 へ進化
-            // 進化後の画像を描画する
-            removeBalls(ball1, ball2); // 元の画像を消去
-          }
+        }
+
+        // IMG_0040_0915094851 と IMG_0051_0915095150 の組み合わせ
+        if (
+          (ball1.evolutionIndex === evolveImages.length - 9 && ball2.evolutionIndex === evolveImages.length - 10) ||
+          (ball1.evolutionIndex === evolveImages.length - 10 && ball2.evolutionIndex === evolveImages.length - 9)
+        ) {
+          increaseScore(MAX_SCORE); // 特別な最大スコアを加算
+          removeBalls(ball1, ball2); // 進化後の画像を消去
+        }
+
+        // IMG_0034_0915094710 と IMG_0035_0915094729 の組み合わせ
+        if (
+          (ball1.evolutionIndex === evolveImages.length - 17 && ball2.evolutionIndex === evolveImages.length - 16) ||
+          (ball1.evolutionIndex === evolveImages.length - 16 && ball2.evolutionIndex === evolveImages.length - 17)
+        ) {
+          increaseScore(SPECIAL_SCORE); // 17番目に多いスコアを加算
+          ball1.evolutionIndex = evolveImages.length - 7; // IMG_0036_0915094747 へ進化
+          ball2.evolutionIndex = evolveImages.length - 7; // IMG_0036_0915094747 へ進化
+          // 進化後の画像を描画する
+          removeBalls(ball1, ball2); // 元の画像を消去
         }
       }
 
@@ -195,6 +258,10 @@
       function triggerGameOver() {
         gameOver = true;
         document.getElementById('gameOverMessage').style.display = 'block';
+      }
+
+      function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
       }
     </script>
   </body>
