@@ -103,24 +103,31 @@
       canvas = document.getElementById('gameCanvas');
       ctx = canvas.getContext('2d');
       resizeCanvas(window.innerWidth * 0.8, window.innerHeight * 0.8);
+      drawDropZone(); // 落とせる部分を描画
 
       // 初期化処理が完了したら読み込み中のメッセージを非表示にする
       setTimeout(() => {
         document.getElementById('loadingMessage').style.display = 'none';
-        setup();
+        setup(); // ボールの初期化
         requestAnimationFrame(gameLoop);
       }, 1000); // 1秒後にゲームを開始する例
     };
 
     function setup() {
-      // ボールの初期化処理を追加する
-      // 例: balls.push(new Ball(x, y, initialImageIndex));
+      // ボールの初期位置を設定
+      for (let i = 0; i < 10; i++) {
+        let x = Math.random() * (canvas.width - BASE_RADIUS * 2) + BASE_RADIUS;
+        let y = Math.random() * (canvas.height / 3 - BASE_RADIUS * 2) + BASE_RADIUS;
+        let imageIndex = Math.floor(Math.random() * (evolveImages.length - 6)); // IMG_0027_0915094511 から IMG_0031_0915094617までのインデックス
+        balls.push(new Ball(x, y, imageIndex));
+      }
     }
 
     function gameLoop() {
       if (gameOver) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawDropZone(); // 落とせる部分を再描画
 
       for (let ball of balls) {
         ball.update();
@@ -203,13 +210,13 @@
       }
     }
 
-    function removeBalls(ball1, ball2) {
-      balls = balls.filter(ball => ball !== ball1 && ball !== ball2);
+    function increaseScore(amount) {
+      score += amount;
     }
 
-    function increaseScore(amount = 10) {
-      score += amount;
-      updateScore();
+    function drawDropZone() {
+      ctx.fillStyle = 'rgba(200, 200, 200, 0.5)'; // 薄い灰色
+      ctx.fillRect(canvas.width / 3, canvas.height / 3, canvas.width / 3, canvas.height * 2 / 3);
     }
 
     function triggerGameOver() {
@@ -220,10 +227,53 @@
     function resizeCanvas(width, height) {
       canvas.width = width;
       canvas.height = height;
+      drawDropZone(); // キャンバスサイズ変更時に落とせる部分を再描画
     }
-   function windowResized() {
-  resizeCanvas(windowWidth * 0.8, windowHeight * 0.8); // キャンバスサイズを80%に設定
-}
+
+    window.addEventListener('resize', () => {
+      resizeCanvas(window.innerWidth * 0.8, window.innerHeight * 0.8);
+    });
+
+    document.getElementById('expandButton').addEventListener('click', () => {
+      resizeCanvas(window.innerWidth, window.innerHeight);
+    });
+
+    class Ball {
+      constructor(x, y, imageIndex) {
+        this.x = x;
+        this.y = y;
+        this.radius = BASE_RADIUS;
+        this.imageIndex = imageIndex;
+        this.evolutionIndex = imageIndex;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+      }
+
+      update() {
+        if (this.y > canvas.height - this.radius || this.y < this.radius) {
+          this.vy *= -FRICTION;
+        } else {
+          this.vy += GRAVITY;
+        }
+
+        if (this.x > canvas.width - this.radius || this.x < this.radius) {
+          this.vx *= -FRICTION;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.y > canvas.height / 3) {
+          triggerGameOver();
+        }
+      }
+
+      display() {
+        const img = new Image();
+        img.src = evolveImages[this.evolutionIndex];
+        ctx.drawImage(img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+      }
+    }
   </script>
 </body>
 </html>
