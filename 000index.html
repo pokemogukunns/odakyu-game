@@ -137,7 +137,7 @@
           ball.display();
 
           // y座標が上3分の1の半分以上超えたらゲームオーバー
-          let upperLimit = height / 3;
+          let upperLimit = height / 4;
           if (ball.y - ball.diameter / 2 < upperLimit) {
             triggerGameOver();
             return;
