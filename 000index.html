@@ -210,13 +210,20 @@
       }
     }
 
+    function removeBalls(ball1, ball2) {
+      let index1 = balls.indexOf(ball1);
+      let index2 = balls.indexOf(ball2);
+      if (index1 !== -1) balls.splice(index1, 1);
+      if (index2 !== -1) balls.splice(index2, 1);
+    }
+
     function increaseScore(amount) {
       score += amount;
     }
 
     function drawDropZone() {
       ctx.fillStyle = 'rgba(200, 200, 200, 0.5)'; // 薄い灰色
-      ctx.fillRect(canvas.width / 3, canvas.height / 3, canvas.width / 3, canvas.height * 2 / 3);
+      ctx.fillRect(0, canvas.height / 3, canvas.width * 0.8, canvas.height * 2 / 3); // 落とせる部分を描画
     }
 
     function triggerGameOver() {
@@ -274,6 +281,13 @@
         ctx.drawImage(img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
       }
     }
+
+    canvas.addEventListener('click', (event) => {
+      if (gameOver) return;
+      let x = event.clientX - canvas.offsetLeft;
+      let y = canvas.height / 3; // 落とす y 座標は画面の上から 3 分の 1
+      balls.push(new Ball(x, y, Math.floor(Math.random() * (evolveImages.length - 6)))); // 画像のインデックスは IMG_0027_0915094511 から IMG_0031_0915094617 まで
+    });
   </script>
 </body>
 </html>
